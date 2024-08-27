@@ -335,6 +335,7 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" \
             DEVELOPMENT_TEAM="XGK8AJH7WW"
 
+
       # - name: Update App Metadata
       #   run: |
       #     python <<EOF
