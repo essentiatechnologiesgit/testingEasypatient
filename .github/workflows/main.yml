@@ -327,6 +327,7 @@ jobs:
             -workspace ios/testing.xcworkspace \
             -scheme testing \
             -sdk iphoneos \
+            -destination generic/platform=iOS \
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
