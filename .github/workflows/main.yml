@@ -320,13 +320,13 @@ jobs:
       - name: Clean Build Folder
         run: |
           cd ios
-          xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
+          xcodebuild clean -workspace testing.xcworkspace -scheme testing -configuration Release
 
       - name: Build Archive
         run: |
           xcodebuild clean archive \
-            -workspace ios/EasyPatientDynamic.xcworkspace \
-            -scheme EasyPatientDynamic \
+            -workspace ios/testing.xcworkspace \
+            -scheme testing \
             -sdk iphoneos \
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
