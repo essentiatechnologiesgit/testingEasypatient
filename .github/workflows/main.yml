@@ -217,14 +217,7 @@ jobs:
           security import distribution.p12 -k ~/Library/Keychains/"$KEYCHAIN_NAME" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
         
           # Validate that the certificate is present in the keychain
-          security find-certificate -a -c "Common Name" -k ~/Library/Keychains/"$KEYCHAIN_NAME"
-        
-          if [ $? -ne 0 ]; then
-            echo "Certificate not found in the keychain."
-            exit 1
-          else
-            echo "Certificate is present in the keychain."
-          fi
+          security find-certificate -a -c "Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" -p
 
 
 
