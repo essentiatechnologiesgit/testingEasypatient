@@ -332,7 +332,7 @@ jobs:
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
             PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
-            CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
+            CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" \ 
             DEVELOPMENT_TEAM="XGK8AJH7WW"
       # - name: Update App Metadata
       #   run: |
