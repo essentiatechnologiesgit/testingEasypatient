@@ -334,13 +334,15 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" \
             DEVELOPMENT_TEAM="XGK8AJH7WW"
+      
+    
+      
 
-
-      # - name: Update App Metadata
-      #   run: |
-      #     python <<EOF
-      #     import os
-      #     import requests
+      - name: Update App Metadata
+        run: |
+          python <<EOF
+          import os
+          import requests
           
       #     app_id = "36FLSCQT6V"  # The ID of the app you want to update
       #     token = os.getenv('token')  # Your JWT token for authorization
