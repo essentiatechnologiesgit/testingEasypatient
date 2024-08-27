@@ -317,10 +317,11 @@ jobs:
           pod update
           pod install
 
-      - name: Install Xcode 15.3
+      - name: Install Xcode 14.2
         run: |
+          sudo softwareupdate --install-rosetta --agree-to-license
+          sudo xcode-select --install
           sudo xcode-select -s /Applications/Xcode_14.2.app/Contents/Developer
-          xcodebuild -version
 
       - name: Clean Derived Data
         run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
