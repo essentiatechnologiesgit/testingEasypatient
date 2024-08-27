@@ -194,20 +194,38 @@ jobs:
       
       - name: Import certificate to keychain
         run: |
+          KEYCHAIN_NAME="build.keychain"
           KEYCHAIN_PASSWORD="private_pass"
           CERT_P12_PASSWORD="private_pass"
           
           # Create a new keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          
-          # Import the .p12 file into the keychain
-          security import distribution.p12 -k ~/Library/Keychains/build.keychain -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
-          
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+        
+          # Set the keychain as the default keychain
+          security default-keychain -s "$KEYCHAIN_NAME"
+        
           # Add the keychain to the list of keychains
-          security list-keychains -s ~/Library/Keychains/build.keychain
-          
+          security list-keychains -s "$KEYCHAIN_NAME"
+        
           # Unlock the keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" ~/Library/Keychains/build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+        
+          # Set the keychain timeout to 3600 seconds (1 hour)
+          security set-keychain-settings -t 3600 -u "$KEYCHAIN_NAME"
+        
+          # Import the .p12 file into the keychain
+          security import distribution.p12 -k ~/Library/Keychains/"$KEYCHAIN_NAME" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
+        
+          # Validate that the certificate is present in the keychain
+          security find-certificate -a -c "Common Name" -k ~/Library/Keychains/"$KEYCHAIN_NAME"
+        
+          if [ $? -ne 0 ]; then
+            echo "Certificate not found in the keychain."
+            exit 1
+          else
+            echo "Certificate is present in the keychain."
+          fi
+
 
 
       # - name: Retrieve All App IDs
