@@ -194,7 +194,7 @@ jobs:
                 
       - name: Import certificate to keychain
         run: |
-# Path to the keychain
+          # Path to the keychain
           KEYCHAIN_NAME="build.keychain"
           KEYCHAIN_PASSWORD="private_pass"
           CERT_P12_PASSWORD="private_pass"
