@@ -197,27 +197,32 @@ jobs:
           KEYCHAIN_NAME="build.keychain"
           KEYCHAIN_PASSWORD="private_pass"
           CERT_P12_PASSWORD="private_pass"
+          KEYCHAIN_PATH=~/Library/Keychains/"$KEYCHAIN_NAME"
           
           # Create a new keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
         
           # Set the keychain as the default keychain
-          security default-keychain -s ~/Library/Keychains/"$KEYCHAIN_NAME"
+          security default-keychain -s "$KEYCHAIN_PATH"
         
           # Add the keychain to the list of keychains
-          security list-keychains -s "$KEYCHAIN_NAME"
+          security list-keychains -s "$KEYCHAIN_PATH"
         
           # Unlock the keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+        
+          # Check if the keychain is unlocked
+          security show-keychain-info "$KEYCHAIN_PATH" || echo "Keychain is locked"
         
           # Set the keychain timeout to 3600 seconds (1 hour)
-          security set-keychain-settings -t 3600 -u "$KEYCHAIN_NAME"
+          security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
         
           # Import the .p12 file into the keychain
-          security import distribution.p12 -k ~/Library/Keychains/"$KEYCHAIN_NAME" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
+          security import distribution.p12 -k "$KEYCHAIN_PATH" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
         
           # Validate that the certificate is present in the keychain
           security find-certificate -a -c "Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" -p
+
 
 
 
