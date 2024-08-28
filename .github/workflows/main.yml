@@ -201,28 +201,35 @@ jobs:
           
           # Create a new keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+          echo "Keychain created: $KEYCHAIN_NAME"
         
           # Set the keychain as the default keychain
           security default-keychain -s "$KEYCHAIN_PATH"
+          echo "Default keychain set to: $KEYCHAIN_PATH"
         
           # Add the keychain to the list of keychains
           security list-keychains -s "$KEYCHAIN_PATH"
+          echo "Keychain added to the list of keychains: $KEYCHAIN_PATH"
         
           # Unlock the keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "Attempted to unlock keychain: $KEYCHAIN_PATH"
         
           # Check if the keychain is unlocked
-          security show-keychain-info "$KEYCHAIN_PATH" || echo "Keychain is locked"
+          UNLOCK_STATUS=$(security show-keychain-info "$KEYCHAIN_PATH" 2>&1 || echo "Keychain is locked")
+          echo "Keychain status: $UNLOCK_STATUS"
         
           # Set the keychain timeout to 3600 seconds (1 hour)
           security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
+          echo "Keychain timeout set to 3600 seconds"
         
           # Import the .p12 file into the keychain
           security import distribution.p12 -k "$KEYCHAIN_PATH" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
+          echo "Certificate imported to keychain: $KEYCHAIN_PATH"
         
           # Validate that the certificate is present in the keychain
           security find-certificate -a -c "Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" -p
-
+          echo "Certificate found and validated in keychain"
 
 
 
