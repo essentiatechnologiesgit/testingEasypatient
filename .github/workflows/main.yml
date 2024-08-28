@@ -205,12 +205,13 @@ jobs:
               echo "Error creating keychain"
               exit 1
           fi
-          chmod 600 "$KEYCHAIN_PATH"
-          echo "Keychain created: $KEYCHAIN_NAME"
-      
-          # List keychains to verify creation
+
+              # List keychains to verify creation
           security list-keychains
           echo "Checked keychain list for: $KEYCHAIN_NAME"
+          # chmod 600 "$KEYCHAIN_PATH"
+          # echo "Keychain created: $KEYCHAIN_NAME"
+      
       
           # Verify the keychain file exists
           if [ -f "$KEYCHAIN_PATH" ]; then
