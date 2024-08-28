@@ -195,6 +195,7 @@ jobs:
       - name: Import certificate to keychain
         run: |
           # Path to the keychain
+          # Path to the keychain
           KEYCHAIN_NAME="build.keychain"
           KEYCHAIN_PASSWORD="private_pass"
           CERT_P12_PASSWORD="private_pass"
@@ -206,6 +207,10 @@ jobs:
               echo "Error creating keychain"
               exit 1
           fi
+          
+          # Debug: List keychains and check for the created keychain
+          echo "Listing keychains in ~/Library/Keychains/:"
+          ls ~/Library/Keychains/
           
           # Correct path detection: handle .keychain and .keychain-db formats
           if [ ! -f "$KEYCHAIN_PATH" ] && [ -f "${KEYCHAIN_PATH}-db" ]; then
@@ -237,41 +242,62 @@ jobs:
           echo "Keychain timeout set to 3600 seconds"
           
           # Set key partition list for the keychain
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          echo "Key partition list set for keychain: $KEYCHAIN_PATH"
+          # security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          # if [ $? -ne 0 ]; then
+          #     echo "Error setting key partition list"
+          #     exit 1
+          # fi
+          # echo "Key partition list set for keychain: $KEYCHAIN_PATH"
           
-          # Import the .p12 file into the keychain (with verbose output)
-          echo "Importing the .p12 certificate..."
-          security import distribution.p12 -k "$KEYCHAIN_PATH" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign -A -v
+          # Debug: Verify the existence of the .p12 file and provisioning profile
+          if [ ! -f "distribution.p12" ]; then
+              echo "Error: distribution.p12 file not found"
+              exit 1
+          fi
+          if [ ! -f "provisioning_profile.mobileprovision" ]; then
+              echo "Error: provisioning_profile.mobileprovision file not found"
+              exit 1
+          fi
+          
+          # Import the .p12 file into the keychain with verbose logging for debugging
+          security import distribution.p12 -k "$KEYCHAIN_PATH" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign -xv
           if [ $? -ne 0 ]; then
-              echo "Failed to import the .p12 certificate."
+              echo "Error importing certificate"
               exit 1
-          else
-              echo "Certificate imported successfully."
           fi
+          echo "Certificate import attempt completed."
           
-          # Verify the certificate is present
-          CERT_STATUS=$(security find-certificate -a -c "Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" -p "$KEYCHAIN_PATH" 2>&1)
-          if [[ "$CERT_STATUS" == *"could not be found"* ]]; then
-              echo "Certificate not found in the keychain."
-              exit 1
-          else
-              echo "Certificate found in keychain."
-          fi
-          
-          # Import the provisioning profile into the keychain (with verbose output)
-          echo "Importing the provisioning profile..."
-          security import provisioning_profile.mobileprovision -k "$KEYCHAIN_PATH" -v
+          # Import the provisioning profile into the keychain
+          security import provisioning_profile.mobileprovision -k "$KEYCHAIN_PATH"
           if [ $? -ne 0 ]; then
-              echo "Failed to import the provisioning profile."
+              echo "Error importing provisioning profile"
               exit 1
-          else
-              echo "Provisioning profile imported successfully."
           fi
+          echo "Provisioning profile import attempt completed."
+          
+          # Set the certificate to be trusted for code signing
+          CERT_NAME="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
+          CERT_SHA1=$(security find-certificate -a -c "$CERT_NAME" -Z "$KEYCHAIN_PATH" | awk '/SHA-1/{print $NF}')
+          if [ -n "$CERT_SHA1" ]; then
+              security add-trusted-cert -d -r trustRoot -k "$KEYCHAIN_PATH" -p codeSign $CERT_SHA1
+              echo "Set the certificate to be trusted for code signing."
+          else
+              echo "Error: Certificate not found or SHA-1 not extracted"
+              exit 1
+          fi
+          
+          # Validate that the certificate is present in the keychain
+          CERTIFICATE=$(security find-certificate -a -c "$CERT_NAME" -p "$KEYCHAIN_PATH" 2>&1)
+          if [[ "$CERTIFICATE" == *"could not be found"* ]]; then
+              echo "Error: Certificate not found in keychain"
+              exit 1
+          fi
+          echo "Certificate found and validated in keychain"
           
           # Print the keychain contents for debugging (optional)
           security list-keychains
           security find-certificate -a -p
+
 
 
 
