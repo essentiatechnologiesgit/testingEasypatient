@@ -201,8 +201,6 @@ jobs:
       
           # Create a new keychain with restricted permissions
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
-          chmod 777 "$KEYCHAIN_PATH"
-          echo "Keychain created: $KEYCHAIN_NAME"
       
           # Set the keychain as the default keychain
           security default-keychain -s "$KEYCHAIN_PATH"
@@ -211,6 +209,9 @@ jobs:
           # Unlock the keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           echo "Attempted to unlock keychain: $KEYCHAIN_PATH"
+
+          chmod 777 "$KEYCHAIN_PATH"
+          echo "Keychain created: $KEYCHAIN_NAME"
       
           # Check if the keychain is unlocked
           UNLOCK_STATUS=$(security show-keychain-info "$KEYCHAIN_PATH" 2>&1 || echo "Keychain is locked")
